@@ -3,6 +3,16 @@
 const itemsBody = document.querySelector("#items-body");
 const rowTemplate = document.querySelector("#item-row-template");
 const addItemButton = document.querySelector("#add-item");
+const subtotalElement = document.querySelector("#subtotal");
+const discountRate = document.querySelector("#discount-rate");
+const vatRate = document.querySelector("#vat-rate");
+const currency = document.querySelector("#currency");
+const discountRow = document.querySelector("#discount-row");
+const discountTotal = document.querySelector("#discount-total");
+const discountedRow = document.querySelector("#discounted-row");
+const discountedTotal = document.querySelector("#discounted-total");
+const vatRow = document.querySelector("#vat-row");
+const vatTotal = document.querySelector("#vat-total");
 const grandTotal = document.querySelector("#grand-total");
 const estimateDate = document.querySelector("#estimate-date");
 
@@ -32,8 +42,8 @@ function parseNumber(value) {
 function formatMoney(value) {
   const safeValue = Number.isFinite(value) ? value : 0;
   return `${new Intl.NumberFormat("ru-RU", {
-    maximumFractionDigits: 2
-  }).format(safeValue)} ₸`;
+    maximumFractionDigits: 0
+  }).format(Math.round(safeValue))} ${currency.value}`;
 }
 
 function calculateTotals() {
@@ -49,7 +59,23 @@ function calculateTotals() {
     total += safeLineTotal;
   });
 
-  grandTotal.textContent = formatMoney(total);
+  const subtotal = Math.round(total);
+  const discountPercent = Math.max(0, parseNumber(discountRate.value));
+  const vatPercent = Math.max(0, parseNumber(vatRate.value));
+  const discount = Math.round(subtotal * discountPercent / 100);
+  const afterDiscount = subtotal - discount;
+  const vat = Math.round(afterDiscount * vatPercent / 100);
+  const amountDue = afterDiscount + vat;
+
+  subtotalElement.textContent = formatMoney(subtotal);
+  discountTotal.textContent = formatMoney(-discount);
+  discountedTotal.textContent = formatMoney(afterDiscount);
+  vatTotal.textContent = formatMoney(vat);
+  grandTotal.textContent = formatMoney(amountDue);
+
+  discountRow.hidden = discount === 0;
+  discountedRow.hidden = discount === 0;
+  vatRow.hidden = vat === 0;
 }
 
 function updateRowLabels() {
@@ -117,6 +143,10 @@ itemsBody.addEventListener("keydown", (event) => {
 addItemButton.addEventListener("click", () => {
   addItem({ focusName: true });
 });
+
+discountRate.addEventListener("input", calculateTotals);
+vatRate.addEventListener("input", calculateTotals);
+currency.addEventListener("change", calculateTotals);
 
 estimateDate.value = getLocalDateValue();
 addItem();
