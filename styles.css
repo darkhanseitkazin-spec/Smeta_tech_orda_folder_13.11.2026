@@ -825,6 +825,14 @@ td {
     color: transparent;
   }
 
+  input::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+
+  .card:first-of-type {
+    border-top: 0;
+  }
+
   .positions-card {
     margin-bottom: 4mm;
   }

@@ -181,17 +181,3 @@ window.addEventListener("beforeprint", updatePrintDetails);
 estimateDate.value = getLocalDateValue();
 addItem();
 updatePrintDetails();
-
-if (new URLSearchParams(window.location.search).has("print-test")) {
-  document.querySelector('[name="sender"]').value = "ТОО Тех Орда";
-  document.querySelector('[name="recipient"]').value = "Клиент";
-  estimateNumber.value = "001";
-  document.querySelector(".item-name").value = "Монтажные работы";
-  document.querySelector(".item-quantity").value = "1";
-  document.querySelector(".item-price").value = "38000";
-  discountRate.value = "10";
-  vatRate.value = "10";
-  comment.value = "Срок выполнения: 10 рабочих дней. Условия оплаты: предоплата 50%.";
-  calculateTotals();
-  updatePrintDetails();
-}
