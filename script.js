@@ -15,6 +15,12 @@ const vatRow = document.querySelector("#vat-row");
 const vatTotal = document.querySelector("#vat-total");
 const grandTotal = document.querySelector("#grand-total");
 const estimateDate = document.querySelector("#estimate-date");
+const estimateNumber = document.querySelector('[name="estimate-number"]');
+const comment = document.querySelector("#comment");
+const printEstimateButton = document.querySelector("#print-estimate");
+const printEstimateNumber = document.querySelector("#print-estimate-number");
+const printEstimateDate = document.querySelector("#print-estimate-date");
+const printComment = document.querySelector("#print-comment");
 
 function getLocalDateValue() {
   const today = new Date();
@@ -23,6 +29,22 @@ function getLocalDateValue() {
   const day = String(today.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
+}
+
+function formatDateForPrint(value) {
+  const parts = String(value).split("-");
+
+  if (parts.length !== 3) {
+    return value;
+  }
+
+  return `${parts[2]}.${parts[1]}.${parts[0]}`;
+}
+
+function updatePrintDetails() {
+  printEstimateNumber.textContent = estimateNumber.value.trim() || "б/н";
+  printEstimateDate.textContent = formatDateForPrint(estimateDate.value);
+  printComment.textContent = comment.value.trim();
 }
 
 function parseNumber(value) {
@@ -53,10 +75,11 @@ function calculateTotals() {
     const quantity = parseNumber(row.querySelector(".item-quantity").value);
     const price = parseNumber(row.querySelector(".item-price").value);
     const lineTotal = quantity * price;
-    const safeLineTotal = Number.isFinite(lineTotal) ? lineTotal : 0;
+    const safeLineTotal = Number.isFinite(lineTotal) ? Math.round(lineTotal) : 0;
 
     row.querySelector(".line-total").textContent = formatMoney(safeLineTotal);
-    total += safeLineTotal;
+    const nextTotal = total + safeLineTotal;
+    total = Number.isFinite(nextTotal) ? nextTotal : 0;
   });
 
   const subtotal = Math.round(total);
@@ -148,5 +171,27 @@ discountRate.addEventListener("input", calculateTotals);
 vatRate.addEventListener("input", calculateTotals);
 currency.addEventListener("change", calculateTotals);
 
+printEstimateButton.addEventListener("click", () => {
+  updatePrintDetails();
+  window.print();
+});
+
+window.addEventListener("beforeprint", updatePrintDetails);
+
 estimateDate.value = getLocalDateValue();
 addItem();
+updatePrintDetails();
+
+if (new URLSearchParams(window.location.search).has("print-test")) {
+  document.querySelector('[name="sender"]').value = "ТОО Тех Орда";
+  document.querySelector('[name="recipient"]').value = "Клиент";
+  estimateNumber.value = "001";
+  document.querySelector(".item-name").value = "Монтажные работы";
+  document.querySelector(".item-quantity").value = "1";
+  document.querySelector(".item-price").value = "38000";
+  discountRate.value = "10";
+  vatRate.value = "10";
+  comment.value = "Срок выполнения: 10 рабочих дней. Условия оплаты: предоплата 50%.";
+  calculateTotals();
+  updatePrintDetails();
+}

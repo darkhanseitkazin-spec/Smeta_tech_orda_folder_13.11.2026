@@ -14,6 +14,10 @@
       <p class="lead">Заполните реквизиты и позиции — суммы посчитаются автоматически.</p>
     </header>
 
+    <header class="print-header print-only">
+      <h1>Смета № <span id="print-estimate-number">б/н</span> от <span id="print-estimate-date"></span></h1>
+    </header>
+
     <section class="card" aria-labelledby="details-title">
       <div class="section-heading">
         <h2 id="details-title">Реквизиты</h2>
@@ -105,6 +109,23 @@
         <strong id="grand-total">0 ₸</strong>
       </div>
     </section>
+
+    <section class="card comment-card" aria-labelledby="comment-title">
+      <div class="section-heading">
+        <h2 id="comment-title">Комментарий</h2>
+        <p>Сроки, условия оплаты и другие детали</p>
+      </div>
+      <label class="field">
+        <span class="visually-hidden">Комментарий к смете</span>
+        <textarea id="comment" rows="4" placeholder="Например: срок выполнения — 10 рабочих дней, предоплата — 50%"></textarea>
+      </label>
+      <div class="print-comment-value print-only" id="print-comment"></div>
+      <p class="signature print-only">Подпись ____________________</p>
+    </section>
+
+    <div class="print-actions">
+      <button class="print-button" id="print-estimate" type="button">Сохранить PDF</button>
+    </div>
   </main>
 
   <template id="item-row-template">
