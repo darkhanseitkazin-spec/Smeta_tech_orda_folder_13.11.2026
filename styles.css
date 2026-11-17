@@ -494,26 +494,44 @@ td {
 .print-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 16px;
   margin-top: 26px;
 }
 
+.excel-button,
 .print-button {
   padding: 10px 24px;
   border: 3px solid var(--ink);
   border-radius: 999px 999px 12px 999px;
-  background: var(--turquoise);
   color: var(--white);
   font-weight: 900;
   box-shadow: 5px 5px 0 var(--violet);
   transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
+.excel-button {
+  background: var(--violet);
+}
+
+.print-button {
+  background: var(--turquoise);
+}
+
+.excel-button:hover,
 .print-button:hover {
-  background: var(--turquoise-dark);
   box-shadow: 8px 8px 0 var(--yellow);
   transform: translate(-2px, -2px);
 }
 
+.excel-button:hover {
+  background: #4d17ad;
+}
+
+.print-button:hover {
+  background: var(--turquoise-dark);
+}
+
+.excel-button:active,
 .print-button:active {
   box-shadow: 2px 2px 0 var(--violet);
   transform: translate(2px, 2px);
@@ -691,9 +709,12 @@ td {
   }
 
   .print-actions {
+    flex-direction: column;
+    gap: 14px;
     margin: 26px 5px 0;
   }
 
+  .excel-button,
   .print-button {
     width: 100%;
   }
