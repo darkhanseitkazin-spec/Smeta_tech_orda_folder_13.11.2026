@@ -124,9 +124,63 @@
     </section>
 
     <div class="print-actions">
+      <button class="excel-button" id="save-excel" type="button">Сохранить Excel</button>
       <button class="print-button" id="print-estimate" type="button">Сохранить PDF</button>
+      <button class="email-button" id="email-estimate" type="button">Отправить смету по почте</button>
     </div>
   </main>
+
+  <dialog class="email-dialog" id="email-dialog" aria-labelledby="email-dialog-title">
+    <div class="email-dialog-header">
+      <div>
+        <p class="email-dialog-kicker">Отправка клиенту</p>
+        <h2 id="email-dialog-title">Отправить смету по почте</h2>
+      </div>
+      <button class="dialog-close" id="close-email-dialog" type="button" aria-label="Закрыть">×</button>
+    </div>
+
+    <p class="email-dialog-intro">Сначала сохраните смету как PDF, затем выберите этот файл. На поддерживаемых устройствах откроется системное меню отправки. В остальных браузерах откроется готовое письмо.</p>
+
+    <div class="email-steps">
+      <section class="email-step" aria-labelledby="email-step-one">
+        <span class="email-step-number">1</span>
+        <div>
+          <h3 id="email-step-one">Сохраните PDF</h3>
+          <p>В окне печати выберите «Сохранить как PDF».</p>
+          <button class="email-secondary-button" id="email-save-pdf" type="button">Сохранить PDF</button>
+        </div>
+      </section>
+
+      <section class="email-step" aria-labelledby="email-step-two">
+        <span class="email-step-number">2</span>
+        <div>
+          <h3 id="email-step-two">Выберите сохранённый файл</h3>
+          <label class="field email-field">
+            <span>PDF-файл</span>
+            <input id="email-pdf-file" type="file" accept="application/pdf,.pdf">
+          </label>
+        </div>
+      </section>
+
+      <section class="email-step" aria-labelledby="email-step-three">
+        <span class="email-step-number">3</span>
+        <div>
+          <h3 id="email-step-three">Подготовьте письмо</h3>
+          <label class="field email-field">
+            <span>Email клиента (необязательно)</span>
+            <input id="client-email" type="email" inputmode="email" autocomplete="email" placeholder="client@example.com">
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <p class="email-status" id="email-status" role="status" aria-live="polite"></p>
+
+    <div class="email-dialog-actions">
+      <button class="email-cancel-button" id="cancel-email" type="button">Отмена</button>
+      <button class="email-share-button" id="share-email" type="button">Отправить PDF</button>
+    </div>
+  </dialog>
 
   <template id="item-row-template">
     <tr class="item-row">
