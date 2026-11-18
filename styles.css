@@ -446,6 +446,19 @@ button:focus-visible {
   font-size: 23px;
 }
 
+.amount-words-row {
+  padding: 14px 20px 16px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  background: var(--surface);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.amount-words-row strong {
+  font-weight: 650;
+}
+
 .comment-card textarea {
   min-height: 128px;
 }
@@ -1287,6 +1300,14 @@ button:focus-visible {
   .grand-total-row .total-value {
     font-size: 11pt;
     font-weight: 700;
+  }
+
+  .amount-words-row {
+    padding: 2mm 0 0;
+    border-top: 0.5pt solid #999999;
+    color: #000000;
+    background: transparent;
+    font-size: 9.5pt;
   }
 
   .comment-card {

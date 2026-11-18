@@ -14,6 +14,8 @@ const discountedTotal = document.querySelector("#discounted-total");
 const vatRow = document.querySelector("#vat-row");
 const vatTotal = document.querySelector("#vat-total");
 const grandTotal = document.querySelector("#grand-total");
+const amountWordsRow = document.querySelector("#amount-words-row");
+const amountWords = document.querySelector("#amount-words");
 const estimateDate = document.querySelector("#estimate-date");
 const estimateNumber = document.querySelector('[name="estimate-number"]');
 const comment = document.querySelector("#comment");
@@ -66,8 +68,15 @@ function getEstimateEmailSubject() {
 function getEstimateEmailBody() {
   const recipientName = document.querySelector('[name="recipient"]').value.trim();
   const greeting = recipientName ? `Здравствуйте, ${recipientName}!` : "Здравствуйте!";
+  const totals = calculateTotals();
+  const words = amountToWords(totals.amountDue);
+  const totalLines = [`Итого к оплате: ${formatMoney(totals.amountDue)}`];
 
-  return `${greeting}\n\nНаправляю смету в формате PDF.\n\nС уважением.`;
+  if (currency.value === "₸" && words) {
+    totalLines.push(`Сумма прописью: ${words}`);
+  }
+
+  return `${greeting}\n\nНаправляю смету в формате PDF.\n\n${totalLines.join("\n")}\n\nС уважением.`;
 }
 
 function showEmailStatus(message) {
@@ -167,6 +176,110 @@ function formatMoney(value) {
   return `${new Intl.NumberFormat("ru-RU", {
     maximumFractionDigits: 0
   }).format(Math.round(safeValue))} ${currency.value}`;
+}
+
+function getNumberForm(value, forms) {
+  const lastTwoDigits = value % 100;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+    return forms[2];
+  }
+
+  const lastDigit = value % 10;
+
+  if (lastDigit === 1) {
+    return forms[0];
+  }
+
+  if (lastDigit >= 2 && lastDigit <= 4) {
+    return forms[1];
+  }
+
+  return forms[2];
+}
+
+function numberGroupToWords(value, feminine = false) {
+  const hundreds = ["", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"];
+  const tens = ["", "", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто"];
+  const teens = ["десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"];
+  const ones = feminine
+    ? ["", "одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"]
+    : ["", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"];
+  const words = [];
+  const hundredsDigit = Math.floor(value / 100);
+  const lastTwoDigits = value % 100;
+
+  if (hundredsDigit > 0) {
+    words.push(hundreds[hundredsDigit]);
+  }
+
+  if (lastTwoDigits >= 10 && lastTwoDigits <= 19) {
+    words.push(teens[lastTwoDigits - 10]);
+  } else {
+    const tensDigit = Math.floor(lastTwoDigits / 10);
+    const onesDigit = lastTwoDigits % 10;
+
+    if (tensDigit > 0) {
+      words.push(tens[tensDigit]);
+    }
+
+    if (onesDigit > 0) {
+      words.push(ones[onesDigit]);
+    }
+  }
+
+  return words;
+}
+
+function amountToWords(value) {
+  const amount = Math.round(Number(value));
+
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 999999999) {
+    return "";
+  }
+
+  const groups = [
+    {
+      value: Math.floor(amount / 1000000),
+      feminine: false,
+      forms: ["миллион", "миллиона", "миллионов"]
+    },
+    {
+      value: Math.floor(amount / 1000) % 1000,
+      feminine: true,
+      forms: ["тысяча", "тысячи", "тысяч"]
+    },
+    {
+      value: amount % 1000,
+      feminine: false,
+      forms: null
+    }
+  ];
+  const words = [];
+
+  groups.forEach((group) => {
+    if (group.value === 0) {
+      return;
+    }
+
+    words.push(...numberGroupToWords(group.value, group.feminine));
+
+    if (group.forms) {
+      words.push(getNumberForm(group.value, group.forms));
+    }
+  });
+
+  words.push("тенге");
+  const result = words.join(" ");
+  return result.charAt(0).toUpperCase() + result.slice(1);
+}
+
+function updateAmountInWords(amountDue) {
+  const words = amountToWords(amountDue);
+  const shouldShow = currency.value === "₸" && words !== "";
+
+  amountWords.textContent = shouldShow ? words : "";
+  amountWordsRow.hidden = !shouldShow;
 }
 
 function escapeXml(value) {
@@ -384,6 +497,7 @@ function calculateTotals() {
   discountedTotal.textContent = formatMoney(afterDiscount);
   vatTotal.textContent = formatMoney(vat);
   grandTotal.textContent = formatMoney(amountDue);
+  updateAmountInWords(amountDue);
 
   discountRow.hidden = discount === 0;
   discountedRow.hidden = discount === 0;
